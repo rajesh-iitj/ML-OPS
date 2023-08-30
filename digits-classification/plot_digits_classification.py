@@ -16,76 +16,32 @@ import matplotlib.pyplot as plt
 
 # Import datasets, classifiers and performance metrics
 from sklearn import metrics
-from utils import preprocess_data, split_data, train_model, read_digits
+from utils import preprocess_data, split_data, train_model, read_digits, split_train_dev_test, predict_and_eval
 
 
-#1. Get the dataset
+#1. Get the digits data set with images and targets
 X, y = read_digits();
 
 #2. data splitting 
-# Split data into 50% train and 50% test subsets
-X_train, X_test, y_train, y_test = split_data(X, y, test_size=0.3, random_state = False)
+# Split data into 70% train, 15% dev and 15% test subsets
+X_train, X_dev, X_test, y_train, y_dev, y_test = split_train_dev_test(X, y, test_sz = 0.15, dev_sz = 0.15)
 
 #3. Data preprocessing
 # flatten the images
 X_train = preprocess_data(X_train)
+X_dev   = preprocess_data(X_dev)
 X_test  = preprocess_data(X_test)
-        
+    
 #4. Model training
 model = train_model(X_train, y_train, {'gamma': 0.001}, model_type="svm")
 
+#5 predict and evalulate on dev set
+print("**********Prediction and evulation on dev set***********")
+predict_and_eval(model, X_dev, y_dev)
 
-#5. Getting model prediction on test set
-# Predict the value of the digit on the test subset
-predicted = model.predict(X_test)
 
-#6 Qualitative sanity check of the prediction
-#_, axes = plt.subplots(nrows=1, ncols=4, figsize=(10, 3))
-#for ax, image, prediction in zip(axes, X_test, predicted):
-#    ax.set_axis_off()
-#    image = image.reshape(8, 8)
-#    ax.imshow(image, cmap=plt.cm.gray_r, interpolation="nearest")
-#    ax.set_title(f"Prediction: {prediction}")
+#6 predict and evalulate on test 
+print("**********Prediction and evulation on test set***********")
+predict_and_eval(model, X_test, y_test)
 
-#7. Model evaluation
-###############################################################################
-# :func:`~sklearn.metrics.classification_report` builds a text report showing
-# the main classification metrics.
 
-print(
-    f"Classification report for classifier :\n"
-    f"{metrics.classification_report(y_test, predicted)}\n"
-)
-
-###############################################################################
-# We can also plot a :ref:`confusion matrix <confusion_matrix>` of the
-# true digit values and the predicted digit values.
-
-disp = metrics.ConfusionMatrixDisplay.from_predictions(y_test, predicted)
-disp.figure_.suptitle("Confusion Matrix")
-print(f"Confusion matrix:\n{disp.confusion_matrix}")
-
-plt.show()
-
-###############################################################################
-# If the results from evaluating a classifier are stored in the form of a
-# :ref:`confusion matrix <confusion_matrix>` and not in terms of `y_true` and
-# `y_pred`, one can still build a :func:`~sklearn.metrics.classification_report`
-# as follows:
-
-# The ground truth and predicted lists
-y_true = []
-y_pred = []
-cm = disp.confusion_matrix
-
-# For each cell in the confusion matrix, add the corresponding ground truths
-# and predictions to the lists
-for gt in range(len(cm)):
-    for pred in range(len(cm)):
-        y_true += [gt] * cm[gt][pred]
-        y_pred += [pred] * cm[gt][pred]
-
-print(
-    "Classification report rebuilt from confusion matrix:\n"
-    f"{metrics.classification_report(y_true, y_pred)}\n"
-)

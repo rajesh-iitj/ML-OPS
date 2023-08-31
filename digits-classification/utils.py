@@ -27,10 +27,33 @@ def read_digits():
     y = digits.target
     return X, y
 
-# def train_test_dev_split():
-#         return X_train, X_test, y_train, y_test, X_dev, y_dev
+def split_train_dev_test(x, y, test_sz, dev_sz):
+    print("hellow")
+    X_train, X_dev_test, y_train, y_dev_test = train_test_split(x, y, test_size = (test_sz + dev_sz), random_state = False)
+    X_dev, X_test, y_dev, y_test = train_test_split(X_dev_test, y_dev_test, test_size = dev_sz, random_state = False)
+    return X_train, X_dev, X_test, y_train, y_dev, y_test
 
+def predict_and_eval(model, X_test, y_test):
+    predicted = model.predict(X_test)
+    print(
+    f"Classification report for classifier on data set:\n"
+    f"{metrics.classification_report(y_test, predicted)}\n")
+    disp = metrics.ConfusionMatrixDisplay.from_predictions(y_test, predicted)
+    disp.figure_.suptitle("Confusion Matrix")
+    print(f"Confusion matrix:\n{disp.confusion_matrix}")
+    # The ground truth and predicted lists
+    y_true = []
+    y_pred = []
+    cm = disp.confusion_matrix
 
-# def predict_and_eval():
-#      #prediction
-#      #report metrics
+    # For each cell in the confusion matrix, add the corresponding ground truths
+    # and predictions to the lists
+    for gt in range(len(cm)):
+        for pred in range(len(cm)):
+            y_true += [gt] * cm[gt][pred]
+            y_pred += [pred] * cm[gt][pred]
+
+    print(
+        "Classification report rebuilt from confusion matrix:\n"
+        f"{metrics.classification_report(y_true, y_pred)}\n")
+

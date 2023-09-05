@@ -28,12 +28,16 @@ def read_digits():
     return X, y
 
 def split_train_dev_test(x, y, test_sz, dev_sz):
-    print("hellow")
     X_train, X_dev_test, y_train, y_dev_test = train_test_split(x, y, test_size = (test_sz + dev_sz), random_state = False)
     X_dev, X_test, y_dev, y_test = train_test_split(X_dev_test, y_dev_test, test_size = dev_sz, random_state = False)
     return X_train, X_dev, X_test, y_train, y_dev, y_test
 
+
 def predict_and_eval(model, X_test, y_test):
+    predicted = model.predict(X_test)
+    return metrics.accuracy_score(y_test, predicted)
+
+def predict_and_eval2(model, X_test, y_test):
     predicted = model.predict(X_test)
     print(
     f"Classification report for classifier on data set:\n"

@@ -53,9 +53,6 @@ for key, value in list_of_all_test_dev_combination_dictionaries.items():
     list_of_all_param_combination_dictionaries = create_combinations_dict_from_lists(gamma_ranges, C_ranges)
     best_hparams, best_model, best_accuracy    = tune_hparams(X_train, y_train, X_dev, y_dev, list_of_all_param_combination_dictionaries)
 
-    optimal_gamma = best_hparams[0]
-    optimal_C = best_hparams[1]
-    #print("Dev Optimal paramters gamma: ", optimal_gamma, "C: ", optimal_C)
 
     #5. Get model prediction on test set
     #6. Qualitative sanity check of the prediction
@@ -66,7 +63,9 @@ for key, value in list_of_all_test_dev_combination_dictionaries.items():
     test_acc  = predict_and_eval(best_model, X_test, y_test)
     
     print("test_size = ", test_size, "dev_size = ", dev_size, "train_size = ", train_size, "train_acc = ", train_acc, "dev_acc = ", dev_acc, "test_acc = ", test_acc)
-
+    optimal_gamma = best_hparams[0]
+    optimal_C = best_hparams[1]
+    print("best_hparams: ", "gamma: ", optimal_gamma, "C:", optimal_C)
 
 
 

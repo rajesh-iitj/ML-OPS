@@ -32,9 +32,23 @@ def test_hparams_combinations_values():
     assert(bval)
 
 
-# def test_data_splitting():
-#     X, y = read_digits()
-#     X = X[:100, :, :]
-#     y = y[:100]
+def test_data_splitting():
+    X, y = read_digits()
+    X = X[:100,:,:]
+    y = y[:100]
 
-#     X_trai
+    test_size = 0.1
+    dev_size = 0.6
+    train_size = 1 - dev_size - test_size
+
+    X_train, X_dev, X_test, y_train, y_dev, y_test = split_train_dev_test(X, y, test_sz = test_size, dev_sz = dev_size)
+
+    #import pdb; pdb.set_trace()
+
+    assert (len(X_train)    == int(train_size * len(X))) 
+    assert (len(X_dev)      == int(dev_size * len(X))) 
+    assert (len(X_test)     == int(test_size * len(X)))
+
+    #X = X[:100, :, :]
+    #y = y[:100]
+    #X_trai

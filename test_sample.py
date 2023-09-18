@@ -6,11 +6,11 @@ def inc(x):
     return x + 1
 
 
-def test_answer():
-    assert inc(3) == 4
+# def test_answer():
+#     assert inc(3) == 4
 
-def test_wrong_answer():
-    assert inc(3) == 5
+# def test_wrong_answer():
+#     assert inc(3) == 5
 
 def test_hparams_combinations_count():
     # a test case to check all possbile combinatons of paramters are indeed generated

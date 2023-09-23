@@ -26,6 +26,12 @@ def read_digits():
     digits = datasets.load_digits();
     X = digits.images
     y = digits.target
+
+    noSamples, height, width = digits.images.shape
+
+    print ("Total Samples ", noSamples)
+    print ("Images width: ", width, "Height: ", height)
+
     return X, y
 
 def split_train_dev_test(x, y, test_sz, dev_sz):

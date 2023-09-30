@@ -15,9 +15,10 @@ hand-written digits, from 0-9.
 import matplotlib.pyplot as plt
 
 # Import datasets, classifiers and performance metrics
-from sklearn import metrics
+from sklearn import metrics, svm
 from utils import preprocess_data, split_data, train_model, read_digits, split_train_dev_test, predict_and_eval, create_combinations_dict_from_lists, tune_hparams
 import decimal
+from joblib import dump, load
 
 gamma_ranges = [0.001, 0.01, 0.1, 1, 10, 100]
 C_ranges = [0.1, 1, 2, 5, 10]
@@ -51,8 +52,14 @@ for key, value in list_of_all_test_dev_combination_dictionaries.items():
     best_model = None
 
     list_of_all_param_combination_dictionaries = create_combinations_dict_from_lists(gamma_ranges, C_ranges)
-    best_hparams, best_model, best_accuracy    = tune_hparams(X_train, y_train, X_dev, y_dev, list_of_all_param_combination_dictionaries)
+    best_hparams, best_model_path, best_accuracy    = tune_hparams(X_train, y_train, X_dev, y_dev, list_of_all_param_combination_dictionaries)
 
+    # saving the best model
+
+    # delete the model
+
+    # loading of the model
+    best_model = load(best_model_path)
 
     #5. Get model prediction on test set
     #6. Qualitative sanity check of the prediction

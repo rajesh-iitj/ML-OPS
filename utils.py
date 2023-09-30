@@ -1,6 +1,8 @@
 from sklearn import datasets, metrics, svm
 from sklearn.model_selection import train_test_split
 from itertools import product
+import os
+from joblib import dump, load
 
 def preprocess_data(data):
     n_samples = len(data)
@@ -75,9 +77,12 @@ def create_combinations_dict_from_lists(listA, listB):
     comb_dict = {f"({x},{y})": (x, y) for x, y in comb}
     return comb_dict
 
+
+
 def tune_hparams(X_train, y_train, X_dev, y_dev, list_of_all_param_combination_dictionaries):
 
     best_accuracy = -1
+    best_model_path =""
     for key, value in list_of_all_param_combination_dictionaries.items():
         cur_gamma = value[0]
         cur_C = value[1]
@@ -87,7 +92,12 @@ def tune_hparams(X_train, y_train, X_dev, y_dev, list_of_all_param_combination_d
             #print("New best accuracy: ", cur_accuracy)
             best_accuracy = cur_accuracy
             best_model = cur_model
+            best_model_path ="./models/best_model" +"_" + "{}_{}".format(key,value) + ".joblib"
             best_hparams = (cur_gamma, cur_C)
 
     #print("Optimal paramters gamma: ", best_hparams[0], "C: ", best_hparams[1])
-    return best_hparams, best_model, best_accuracy
+    # save the best model
+    dump(best_model, best_model_path)
+    print("Model saved at {}".format(best_model_path))
+
+    return best_hparams, best_model_path, best_accuracy

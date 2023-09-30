@@ -25,4 +25,3 @@ jobs:
         run: pytest
       - name: Run python plot_digits_classification.py
         run: python plot_digits_classification.py
-        run: echo "🎉 The job completed. "

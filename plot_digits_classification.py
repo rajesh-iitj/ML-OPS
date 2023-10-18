@@ -20,6 +20,7 @@ from utils import preprocess_data, split_data, train_model, read_digits, split_t
 import decimal
 from joblib import dump, load
 import pdb
+import pandas as pd
 
 
 #1. Get the digits data set with images and targets
@@ -49,50 +50,60 @@ dev_size_list  = [0.2]      #[0.1, 0.2, 0.3]
 
 list_of_all_test_dev_combination_dictionaries = create_combinations_dict_from_lists(test_size_list, dev_size_list)
 
-for key, value in list_of_all_test_dev_combination_dictionaries.items():
-    #split the train, dev and test
-    test_size = value[0]
-    dev_size  = value[1]
-    train_size = 1 - test_size - dev_size
-    train_size = round(train_size, 2)
-    X_train, X_dev, X_test, y_train, y_dev, y_test = split_train_dev_test(X, y, test_sz = test_size, dev_sz = dev_size)
-    #3. Data preprocessing
-    # flatten the images
-    X_train = preprocess_data(X_train)
-    X_dev   = preprocess_data(X_dev)
-    X_test  = preprocess_data(X_test)
-    
+num_runs = 5
 
-    for model_type in classifier_param_dict:
-        #breakpoint()
-        #4. Hyper paramter tuning
-        #- take all combinations of gamma and C
-        current_hparams = classifier_param_dict[model_type]
-        best_model = None
+results = []
 
-        best_hparams, best_model_path, best_accuracy = tune_hparams(X_train, y_train, X_dev, y_dev, current_hparams, model_type)
-
-        # saving the best model
-
-        # delete the model
-
-        # loading of the model
-        best_model = load(best_model_path)
-
-        #5. Get model prediction on test set
-        #6. Qualitative sanity check of the prediction
-        #7. Evaluation
+for curr_run_i in range(num_runs):
+    cur_run_results = {}
+    for key, value in list_of_all_test_dev_combination_dictionaries.items():
+        #split the train, dev and test
+        test_size = value[0]
+        dev_size  = value[1]
+        train_size = 1 - test_size - dev_size
+        train_size = round(train_size, 2)
+        X_train, X_dev, X_test, y_train, y_dev, y_test = split_train_dev_test(X, y, test_sz = test_size, dev_sz = dev_size)
+        #3. Data preprocessing
+        # flatten the images
+        X_train = preprocess_data(X_train)
+        X_dev   = preprocess_data(X_dev)
+        X_test  = preprocess_data(X_test)
         
-        train_acc = predict_and_eval(best_model, X_train, y_train)
-        dev_acc   = best_accuracy
-        test_acc  = predict_and_eval(best_model, X_test, y_test)
-        
-        #print("{}\ttest_size={:.2f} dev_size=={:.2f} train_size={:.2f} train-acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, dev_size, train_size, train_acc, dev_acc, test_acc))
-        print("{} \t test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
-        #print("model: ", model_type," test_size = ", test_size, "dev_size = ", dev_size, "train_size = ", train_size, "train_acc = ", train_acc, "dev_acc = ", dev_acc, "test_acc = ", test_acc)
-        #pdb.set_trace()
-        #print("best_hparams: ", best_hparams)
 
+        for model_type in classifier_param_dict:
+            #breakpoint()
+            #4. Hyper paramter tuning
+            #- take all combinations of gamma and C
+            current_hparams = classifier_param_dict[model_type]
+            best_model = None
+
+            best_hparams, best_model_path, best_accuracy = tune_hparams(X_train, y_train, X_dev, y_dev, current_hparams, model_type)
+
+            # saving the best model
+
+            # delete the model
+
+            # loading of the model
+            best_model = load(best_model_path)
+
+            #5. Get model prediction on test set
+            #6. Qualitative sanity check of the prediction
+            #7. Evaluation
+            
+            train_acc = predict_and_eval(best_model, X_train, y_train)
+            dev_acc   = best_accuracy
+            test_acc  = predict_and_eval(best_model, X_test, y_test)
+            
+            print("{} \t test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
+            #print("best_hparams: ", best_hparams)
+            cur_run_results= {'model_type':model_type, 'run_index':curr_run_i, 'train_acc':train_acc, 'dev_acc':dev_acc, 'test_acc':test_acc}
+            results.append(cur_run_results)
+
+results_df = pd.DataFrame(results)
+
+print(pd.DataFrame(results).groupby('model_type').describe().T)
+
+#breakpoint()
 
 
 

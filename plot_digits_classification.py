@@ -13,7 +13,7 @@ hand-written digits, from 0-9.
 
 # Standard scientific Python imports
 import matplotlib.pyplot as plt
-
+import sys
 # Import datasets, classifiers and performance metrics
 from sklearn import metrics, svm
 from utils import preprocess_data, split_data, train_model, read_digits, split_train_dev_test, predict_and_eval, create_combinations_dict_from_lists, tune_hparams, get_hyperparameter_combinations
@@ -21,7 +21,30 @@ import decimal
 from joblib import dump, load
 import pdb
 import pandas as pd
+import argparse
 
+
+#python plot_digits_classification.py num_runs dev_size_list test_size_list model_types
+#script_name     = sys.argv[0]
+
+#model_types     = ["svm", "dtree"]
+#num_runs        = 5
+#test_size_list  = [0.2] #[0.1, 0.2, 0.3]
+#dev_size_list   = [0.2] #[0.1, 0.2, 0.3]
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--runs", type = int, help="runs",default=2)
+parser.add_argument("--dev_size", type = float, help="dev_size",default=0.2)
+parser.add_argument("--test_size", type = float, help="test_size",default=0.2)
+parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="svm")
+args = parser.parse_args()
+
+num_runs = args.runs
+test_size_list  = [args.test_size]
+dev_size_list   = [args.dev_size]
+model_types     = [args.model]
+
+#breakpoint()
 
 #1. Get the digits data set with images and targets
 X, y = read_digits();
@@ -41,16 +64,15 @@ max_depth_list = [5, 10, 15, 20, 50, 100]
 h_params_tree = {}
 h_params_tree['max_depth'] = max_depth_list
 h_params_combinations = get_hyperparameter_combinations(h_params_tree) 
-classifier_param_dict['tree'] = h_params_combinations
+classifier_param_dict['dtree'] = h_params_combinations
 #2. data splitting 
 # Split data into all possbile combination of test_size_list and dev_size_list
 
-test_size_list = [0.2]      #[0.1, 0.2, 0.3]
-dev_size_list  = [0.2]      #[0.1, 0.2, 0.3]
+
 
 list_of_all_test_dev_combination_dictionaries = create_combinations_dict_from_lists(test_size_list, dev_size_list)
 
-num_runs = 5
+
 
 results = []
 

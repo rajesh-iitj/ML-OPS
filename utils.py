@@ -22,7 +22,7 @@ def train_model(x,y, model_paramters, model_type="svm"):
     if model_type == "svm":
         # Create a classifier: a support vector classifier
         clf = svm.SVC
-    elif model_type == "tree":
+    elif model_type == "dtree":
         clf = tree.DecisionTreeClassifier
 
     model = clf(**model_paramters)

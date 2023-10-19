@@ -1,6 +1,6 @@
 #content of test_sample.py
 
-from utils import create_combinations_dict_from_lists, read_digits, split_train_dev_test, preprocess_data, tune_hparams
+from utils import create_combinations_dict_from_lists, read_digits, split_train_dev_test, preprocess_data, tune_hparams, get_hyperparameter_combinations
 import os
 
 def inc(x):
@@ -86,9 +86,13 @@ def test_data_splitting():
 def create_dummy_hyperparamters():
     gamma_list = [0.001, 0.01]
     C_list = [1]
-    h_params_combination = create_combinations_dict_from_lists(gamma_list, C_list)
 
-    return h_params_combination
+    h_params= {}
+    h_params['gamma'] = gamma_list
+    h_params['C'] = C_list
+    h_params_combinations = get_hyperparameter_combinations(h_params) 
+    #breakpoint()
+    return h_params_combinations
 def create_dummy_data():
     X, y = read_digits()
 
@@ -107,6 +111,6 @@ def test_model_saving():
     X_train, y_train, X_dev, y_dev = create_dummy_data()
     h_params_combination = create_dummy_hyperparamters()
 
-    _, best_model_path, _ = tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combination)
+    _, best_model_path, _ = tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combination, model_type='svm')
 
     assert os.path.exists(best_model_path)

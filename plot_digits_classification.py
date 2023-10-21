@@ -27,7 +27,7 @@ import os
 #python plot_digits_classification.py num_runs dev_size_list test_size_list model_types
 #script_name     = sys.argv[0]
 
-model_types     = ["svm", "dtree", "rf"]
+model_types     = ["svm", "dtree"]
 #num_runs        = 5
 #test_size_list  = [0.2] #[0.1, 0.2, 0.3]
 #dev_size_list   = [0.2] #[0.1, 0.2, 0.3]
@@ -116,6 +116,9 @@ list_of_all_test_dev_combination_dictionaries = create_combinations_dict_from_li
 
 results = []
 
+production_acc = 0
+candidate_acc  = 0 
+
 for curr_run_i in range(num_runs):
     cur_run_results = {}
     for key, value in list_of_all_test_dev_combination_dictionaries.items():
@@ -152,18 +155,33 @@ for curr_run_i in range(num_runs):
             #6. Qualitative sanity check of the prediction
             #7. Evaluation
             
-            train_acc = predict_and_eval(best_model, X_train, y_train)
+            train_acc ,_, _ = predict_and_eval(best_model, X_train, y_train)
             dev_acc   = best_accuracy
-            test_acc  = predict_and_eval(best_model, X_test, y_test)
+            test_acc, cmatrix, fscore  = predict_and_eval(best_model, X_test, y_test)
+
+            if (model_type ==svm):
+                production_acc = test_acc
+                production_cm = cmatrix
+                production_fscore = fscore
+                print("production_acc: ", production_acc)
+                print("production_cm: ")
+                print("production_fscore", production_fscore)
+            else:
+                candidate_acc = test_acc
+                candidate_cm = cmatrix
+                candiate_fscore = fscore
+                print("candidate_acc: ", candidate_acc)
+                print("candidate_cm: ", candidate_cm)
+                print("candiate_fscore", candiate_fscore)
             
-            print("{} \t test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
+            #print("{} \t test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
             #print("best_hparams: ", best_hparams)
             cur_run_results= {'model_type':model_type, 'run_index':curr_run_i, 'train_acc':train_acc, 'dev_acc':dev_acc, 'test_acc':test_acc}
             results.append(cur_run_results)
 
 results_df = pd.DataFrame(results)
 
-print(pd.DataFrame(results).groupby('model_type').describe().T)
+#print(pd.DataFrame(results).groupby('model_type').describe().T)
 
 std_test_acc    = results_df.groupby('model_type')['test_acc'].std()
 mean_test_acc   = results_df.groupby('model_type')['test_acc'].mean()

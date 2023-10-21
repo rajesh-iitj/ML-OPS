@@ -6,7 +6,7 @@ from itertools import product
 import os
 from joblib import dump, load
 import pdb
-
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 
 def preprocess_data(data):
     n_samples = len(data)
@@ -54,7 +54,9 @@ def split_train_dev_test(x, y, test_sz, dev_sz):
 
 def predict_and_eval(model, X_test, y_test):
     predicted = model.predict(X_test)
-    return metrics.accuracy_score(y_test, predicted)
+    cmatrix = confusion_matrix(y_test, predicted, labels=range(10))
+    fscore = f1_score(y_test, predicted, average='macro')
+    return metrics.accuracy_score(y_test, predicted), cmatrix, fscore
 
 def predict_and_eval2(model, X_test, y_test):
     predicted = model.predict(X_test)
@@ -109,7 +111,7 @@ def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations, model_ty
     best_model_path =""
     for h_params in h_params_combinations:
         cur_model = train_model(X_train, y_train, h_params, model_type = model_type)
-        cur_accuracy = predict_and_eval(cur_model, X_dev, y_dev)
+        cur_accuracy, _,_ = predict_and_eval(cur_model, X_dev, y_dev)
         if cur_accuracy > best_accuracy:
             #print("New best accuracy: ", cur_accuracy)
             best_accuracy = cur_accuracy

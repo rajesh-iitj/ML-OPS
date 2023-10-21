@@ -22,28 +22,56 @@ from joblib import dump, load
 import pdb
 import pandas as pd
 import argparse
-
-
+import json
+import os
 #python plot_digits_classification.py num_runs dev_size_list test_size_list model_types
 #script_name     = sys.argv[0]
 
-#model_types     = ["svm", "dtree"]
+model_types     = ["svm", "dtree"]
 #num_runs        = 5
 #test_size_list  = [0.2] #[0.1, 0.2, 0.3]
 #dev_size_list   = [0.2] #[0.1, 0.2, 0.3]
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--runs", type = int, help="runs",default=2)
-parser.add_argument("--dev_size", type = float, help="dev_size",default=0.2)
-parser.add_argument("--test_size", type = float, help="test_size",default=0.2)
-parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="svm")
+parser.add_argument("--runs", type = int, help="runs")
+#parser.add_argument("--dev_size", type = float, help="dev_size",default=0.2)
+#parser.add_argument("--test_size", type = float, help="test_size",default=0.2)
+
+parser.add_argument('--test_size_list', nargs='+', type=float, help='test_size_list', default=0.2)
+parser.add_argument('--dev_size_list',  nargs='+', type=float, help='dev_size_list' , default=0.2)
+
+
+#parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="svm")
 args = parser.parse_args()
 
 num_runs = args.runs
-test_size_list  = [args.test_size]
-dev_size_list   = [args.dev_size]
-model_types     = [args.model]
 
+test_size_list  = args.test_size_list
+dev_size_list   = args.dev_size_list
+#breakpoint()
+
+#test_size_list  = [args.test_size]
+#dev_size_list   = [args.dev_size]
+#model_types     = [args.model]
+
+#read the hyperparams from jason file
+
+config_file_path = os.path.join('./', 'config.json')
+if not os.path.isfile(config_file_path):
+    print("Hyperparam config file does not exists")
+    gamma_ranges = [0.0001, 0.0005, 0.001, 0.01, 0.1, 1]
+    C_ranges = [0.1, 1, 2, 5, 10]
+    max_depth_list = [5, 10, 15, 20, 50, 100]
+else:
+    with open(config_file_path, 'r') as file:
+        print("Reading hyperparam from config file")
+        data = json.load(file) 
+        svm_params = data['svm']
+        dtree_params = data['dtree']
+
+        gamma_ranges = svm_params['gamma']
+        C_ranges = svm_params['C']
+        max_depth_list = dtree_params['max_depth']
 #breakpoint()
 
 #1. Get the digits data set with images and targets
@@ -52,15 +80,14 @@ X, y = read_digits();
 #2. Hyperparamter combinations
 classifier_param_dict = {}
 #2.1 SVM
-gamma_ranges = [0.0001, 0.0005, 0.001, 0.01, 0.1, 1]
-C_ranges = [0.1, 1, 2, 5, 10]
+
 h_params = {}
 h_params['gamma'] = gamma_ranges
 h_params['C'] = C_ranges
 h_params_combinations = get_hyperparameter_combinations(h_params) 
 classifier_param_dict['svm'] = h_params_combinations
 #2.2 Decission trees
-max_depth_list = [5, 10, 15, 20, 50, 100]
+
 h_params_tree = {}
 h_params_tree['max_depth'] = max_depth_list
 h_params_combinations = get_hyperparameter_combinations(h_params_tree) 
@@ -125,7 +152,23 @@ results_df = pd.DataFrame(results)
 
 print(pd.DataFrame(results).groupby('model_type').describe().T)
 
-#breakpoint()
+std_test_acc    = results_df.groupby('model_type')['test_acc'].std()
+mean_test_acc   = results_df.groupby('model_type')['test_acc'].mean()
 
+best_model = 'dtree'
+other_model = 'svm'
+if mean_test_acc['svm'] >= mean_test_acc['dtree']:
+    best_model = 'svm'
+    other_model ='dtree'
+
+other_high  = mean_test_acc[other_model]    + std_test_acc[other_model]
+best_low    = mean_test_acc[best_model]     - std_test_acc[best_model]
+y
+if (best_low > other_high):
+    print("high confidence that", best_model, "performing better ")
+else:
+    print("low confidence that", best_model, "performing better ")
+
+#breakpoint()
 
 

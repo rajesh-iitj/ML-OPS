@@ -37,8 +37,8 @@ parser.add_argument("--runs", type = int, help="runs")
 #parser.add_argument("--dev_size", type = float, help="dev_size",default=0.2)
 #parser.add_argument("--test_size", type = float, help="test_size",default=0.2)
 
-parser.add_argument('--test_size_list', nargs='+', type=float, help='test_size_list', default=0.2)
-parser.add_argument('--dev_size_list',  nargs='+', type=float, help='dev_size_list' , default=0.2)
+parser.add_argument('--test_size_list', nargs='+', type=float, help='test_size_list', default=[0.2])
+parser.add_argument('--dev_size_list',  nargs='+', type=float, help='dev_size_list' , default=[0.2])
 
 
 #parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="svm")

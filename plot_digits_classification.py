@@ -62,7 +62,7 @@ if not os.path.isfile(config_file_path):
     gamma_ranges        = [0.0001, 0.0005, 0.001, 0.01, 0.1, 1]
     C_ranges            = [0.1, 1, 2, 5, 10]
     max_depth_list      = [5, 10, 15, 20, 50, 100]
-    n_estimator_list    = [100, 5]
+    n_estimators_list    = [100, 5]
     criterion_list      = ['gini', 'entropy']
 else:
     with open(config_file_path, 'r') as file:

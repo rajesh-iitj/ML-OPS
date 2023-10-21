@@ -1,6 +1,7 @@
 from sklearn import datasets, metrics, svm
 from sklearn.model_selection import train_test_split
 from sklearn import tree
+from sklearn.ensemble import RandomForestClassifier
 from itertools import product
 import os
 from joblib import dump, load
@@ -22,8 +23,10 @@ def train_model(x,y, model_paramters, model_type="svm"):
     if model_type == "svm":
         # Create a classifier: a support vector classifier
         clf = svm.SVC
-    elif model_type == "tree":
+    elif model_type == "dtree":
         clf = tree.DecisionTreeClassifier
+    elif model_type == "rf":
+        clf = RandomForestClassifier
 
     model = clf(**model_paramters)
     # train the model

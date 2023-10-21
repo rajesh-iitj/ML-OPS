@@ -13,7 +13,7 @@ hand-written digits, from 0-9.
 
 # Standard scientific Python imports
 import matplotlib.pyplot as plt
-
+import sys
 # Import datasets, classifiers and performance metrics
 from sklearn import metrics, svm
 from utils import preprocess_data, split_data, train_model, read_digits, split_train_dev_test, predict_and_eval, create_combinations_dict_from_lists, tune_hparams, get_hyperparameter_combinations
@@ -21,6 +21,64 @@ import decimal
 from joblib import dump, load
 import pdb
 import pandas as pd
+import argparse
+import json
+import os
+#python plot_digits_classification.py num_runs dev_size_list test_size_list model_types
+#script_name     = sys.argv[0]
+
+model_types     = ["svm", "dtree", "rf"]
+#num_runs        = 5
+#test_size_list  = [0.2] #[0.1, 0.2, 0.3]
+#dev_size_list   = [0.2] #[0.1, 0.2, 0.3]
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--runs", type = int, help="runs")
+#parser.add_argument("--dev_size", type = float, help="dev_size",default=0.2)
+#parser.add_argument("--test_size", type = float, help="test_size",default=0.2)
+
+parser.add_argument('--test_size_list', nargs='+', type=float, help='test_size_list', default=[0.2])
+parser.add_argument('--dev_size_list',  nargs='+', type=float, help='dev_size_list' , default=[0.2])
+
+
+parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="svm")
+args = parser.parse_args()
+
+num_runs = args.runs
+
+test_size_list  = args.test_size_list
+dev_size_list   = args.dev_size_list
+#breakpoint()
+
+#test_size_list  = [args.test_size]
+#dev_size_list   = [args.dev_size]
+#model_types     = [args.model]
+
+#read the hyperparams from jason file
+
+config_file_path = os.path.join('./', 'config.json')
+if not os.path.isfile(config_file_path):
+    print("Hyperparam config file does not exists")
+    gamma_ranges        = [0.0001, 0.0005, 0.001, 0.01, 0.1, 1]
+    C_ranges            = [0.1, 1, 2, 5, 10]
+    max_depth_list      = [5, 10, 15, 20, 50, 100]
+    n_estimators_list    = [100, 5]
+    criterion_list      = ['gini', 'entropy']
+else:
+    with open(config_file_path, 'r') as file:
+        print("Reading hyperparam from config file")
+        data                = json.load(file) 
+
+        svm_params          = data['svm']
+        gamma_ranges        = svm_params['gamma']
+        C_ranges            = svm_params['C']
+        
+        dtree_params        = data['dtree']
+        max_depth_list      = dtree_params['max_depth']
+        
+        rf_params           = data['rf']
+        n_estimators_list   = rf_params['n_estimators']
+        criterion_list      = rf_params["criterion"]
 
 
 #1. Get the digits data set with images and targets
@@ -29,28 +87,32 @@ X, y = read_digits();
 #2. Hyperparamter combinations
 classifier_param_dict = {}
 #2.1 SVM
-gamma_ranges = [0.0001, 0.0005, 0.001, 0.01, 0.1, 1]
-C_ranges = [0.1, 1, 2, 5, 10]
-h_params = {}
-h_params['gamma'] = gamma_ranges
-h_params['C'] = C_ranges
-h_params_combinations = get_hyperparameter_combinations(h_params) 
+
+h_params_svm = {}
+h_params_svm['gamma'] = gamma_ranges
+h_params_svm['C'] = C_ranges
+h_params_combinations = get_hyperparameter_combinations(h_params_svm) 
 classifier_param_dict['svm'] = h_params_combinations
 #2.2 Decission trees
-max_depth_list = [5, 10, 15, 20, 50, 100]
+
 h_params_tree = {}
 h_params_tree['max_depth'] = max_depth_list
 h_params_combinations = get_hyperparameter_combinations(h_params_tree) 
-classifier_param_dict['tree'] = h_params_combinations
+classifier_param_dict['dtree'] = h_params_combinations
+
+#2.3 Ramdom forest
+h_params_rf = {}
+h_params_rf['n_estimators'] = n_estimators_list
+h_params_rf['criterion']    = criterion_list
+h_params_combinations       = get_hyperparameter_combinations(h_params_rf)
+classifier_param_dict['rf'] = h_params_combinations
+
 #2. data splitting 
 # Split data into all possbile combination of test_size_list and dev_size_list
 
-test_size_list = [0.2]      #[0.1, 0.2, 0.3]
-dev_size_list  = [0.2]      #[0.1, 0.2, 0.3]
+
 
 list_of_all_test_dev_combination_dictionaries = create_combinations_dict_from_lists(test_size_list, dev_size_list)
-
-num_runs = 5
 
 results = []
 
@@ -103,7 +165,23 @@ results_df = pd.DataFrame(results)
 
 print(pd.DataFrame(results).groupby('model_type').describe().T)
 
-#breakpoint()
+std_test_acc    = results_df.groupby('model_type')['test_acc'].std()
+mean_test_acc   = results_df.groupby('model_type')['test_acc'].mean()
 
+best_model = 'dtree'
+other_model = 'svm'
+if mean_test_acc['svm'] >= mean_test_acc['dtree']:
+    best_model = 'svm'
+    other_model ='dtree'
+
+other_high  = mean_test_acc[other_model]    + std_test_acc[other_model]
+best_low    = mean_test_acc[best_model]     - std_test_acc[best_model]
+y
+if (best_low > other_high):
+    print("high confidence that", best_model, "performing better ")
+else:
+    print("low confidence that", best_model, "performing better ")
+
+#breakpoint()
 
 

@@ -28,12 +28,12 @@ import os
 #script_name     = sys.argv[0]
 
 model_types     = ["svm", "dtree"]
-#num_runs        = 5
+num_runs        = 5
 #test_size_list  = [0.2] #[0.1, 0.2, 0.3]
 #dev_size_list   = [0.2] #[0.1, 0.2, 0.3]
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--runs", type = int, help="runs")
+parser.add_argument("--runs", type = int, help="runs", default=2)
 #parser.add_argument("--dev_size", type = float, help="dev_size",default=0.2)
 #parser.add_argument("--test_size", type = float, help="test_size",default=0.2)
 
@@ -158,24 +158,9 @@ for curr_run_i in range(num_runs):
             train_acc ,_, _ = predict_and_eval(best_model, X_train, y_train)
             dev_acc   = best_accuracy
             test_acc, cmatrix, fscore  = predict_and_eval(best_model, X_test, y_test)
-
-            if (model_type ==svm):
-                production_acc = test_acc
-                production_cm = cmatrix
-                production_fscore = fscore
-                print("production_acc: ", production_acc)
-                print("production_cm: ")
-                print("production_fscore", production_fscore)
-            else:
-                candidate_acc = test_acc
-                candidate_cm = cmatrix
-                candiate_fscore = fscore
-                print("candidate_acc: ", candidate_acc)
-                print("candidate_cm: ", candidate_cm)
-                print("candiate_fscore", candiate_fscore)
             
-            #print("{} \t test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
-            #print("best_hparams: ", best_hparams)
+            print("{} \t test_size={:.2f} dev_size={:.2f} train_size={:.2f} train_acc={:.2f} dev_acc={:.2f} test_acc={:.2f}".format(model_type, test_size, dev_size, train_size, train_acc, dev_acc, test_acc))
+            print("best_hparams: ", best_hparams)
             cur_run_results= {'model_type':model_type, 'run_index':curr_run_i, 'train_acc':train_acc, 'dev_acc':dev_acc, 'test_acc':test_acc}
             results.append(cur_run_results)
 

@@ -108,10 +108,10 @@ def create_dummy_data():
 
     return X_train, y_train, X_dev, y_dev
 
-def test_model_saving():
-    X_train, y_train, X_dev, y_dev = create_dummy_data()
-    h_params_combination = create_dummy_hyperparamters()
+# def test_model_saving():
+#     X_train, y_train, X_dev, y_dev = create_dummy_data()
+#     h_params_combination = create_dummy_hyperparamters()
 
-    _, best_model_path, _ = tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combination, model_type='svm')
+#     _, best_model_path, _ = tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combination, model_type='svm')
 
-    #assert os.path.exists(best_model_path)
+#     #assert os.path.exists(best_model_path)

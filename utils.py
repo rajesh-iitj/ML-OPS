@@ -51,7 +51,6 @@ def split_train_dev_test(x, y, test_sz, dev_sz):
     X_dev, X_test, y_dev, y_test = train_test_split(X_dev_test, y_dev_test, train_size = new_dev_sz, random_state = False, shuffle=True)
     return X_train, X_dev, X_test, y_train, y_dev, y_test
 
-
 def predict_and_eval(model, X_test, y_test):
     predicted = model.predict(X_test)
     cmatrix = confusion_matrix(y_test, predicted, labels=range(10))

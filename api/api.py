@@ -17,3 +17,9 @@ def pred_model():
     x = js['x']
     y = js['y']
     return x + y
+
+@app.route("/predict", methods = ['POST'])
+def pred_image():
+    js = request.get_json( )
+    x = js['image']
+    return x

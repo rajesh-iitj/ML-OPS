@@ -32,22 +32,21 @@ def pred_model():
 @app.route("/predict", methods = ['POST'])
 def pred_image():
     js = request.get_json( )
+    image1 = js['image']
+    best_model = load('./models/svm_gamma:0.001_C:1.joblib')
+    image1_1d = np.array(image1).reshape(1, -1)
+    predicted1 = best_model.predict(image1_1d)
+    return str(predicted1)
+
+
+@app.route("/compare", methods = ['POST'])
+def comp_image():
+    js = request.get_json( )
     image1 = js['image1']
     image2 = js['image2']
-    best_model = load('../models/svm_gamma:0.001_C:1.joblib')
-
-    n_samples = len(image1)
-    image1_2d = np.array(image1)
-    image1_2d = image1_2d.reshape((n_samples, -1))
-
-    n_samples = len(image2)
-    image2_2d = np.array(image2)
-    image2_2d = image2_2d.reshape((n_samples, -1))
-
-    predicted1 = best_model.predict(image1_2d)
-    predicted2 = best_model.predict(image2_2d)
-
+    best_model = load('./models/svm_gamma:0.001_C:1.joblib')
+    image1_1d = np.array(image1).reshape(1, -1)
+    image2_1d = np.array(image2).reshape(1, -1)
+    predicted1 = best_model.predict(image1_1d)
+    predicted2 = best_model.predict(image2_1d)
     return str(predicted1 == predicted2)
-
-
-    return str(x==y)

@@ -25,5 +25,4 @@ jobs:
         run: pytest
       - name: Run python plot_digits_classification.py
         run: python plot_digits_classification.py --runs 2
-      - name: Run docker_buidls.sh
-        run: ./docker_build.sh
+        

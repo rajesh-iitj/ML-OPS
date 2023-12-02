@@ -10,5 +10,8 @@
     "rf":{
         "n_estimators": [100, 120],
         "criterion": ["gini", "entropy"]
+    },
+    "lr":{
+        "solver": ["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"]
     }
 }

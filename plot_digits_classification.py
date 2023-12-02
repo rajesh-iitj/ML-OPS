@@ -27,7 +27,8 @@ import os
 #python plot_digits_classification.py num_runs dev_size_list test_size_list model_types
 #script_name     = sys.argv[0]
 
-model_types     = ["svm", "dtree"]
+#model_types     = ["svm", "dtree", "lr"]
+model_types      = ["lr", "svm", "dtree"]
 num_runs        = 5
 #test_size_list  = [0.2] #[0.1, 0.2, 0.3]
 #dev_size_list   = [0.2] #[0.1, 0.2, 0.3]
@@ -41,7 +42,7 @@ parser.add_argument('--test_size_list', nargs='+', type=float, help='test_size_l
 parser.add_argument('--dev_size_list',  nargs='+', type=float, help='dev_size_list' , default=[0.2])
 
 
-parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="svm")
+parser.add_argument("--model", type = str, help="model, choices = {svm, dtree}",default="lr")
 args = parser.parse_args()
 
 num_runs = args.runs
@@ -77,10 +78,14 @@ else:
         dtree_params        = data['dtree']
         max_depth_list      = dtree_params['max_depth']
 
-         # read the parameters for random tree
+        # read the parameters for random tree
         rf_params           = data['rf']
         n_estimators_list   = rf_params['n_estimators']
         criterion_list      = rf_params["criterion"]
+
+        #read the parmeters for logistic regression
+        lr_params           = data['lr']
+        solver_list         = lr_params["solver"]
 
 #1. Get the digits data set with images and targets
 X, y = read_digits();
@@ -107,8 +112,11 @@ h_params_rf['n_estimators'] = n_estimators_list
 h_params_rf['criterion']    = criterion_list
 h_params_combinations       = get_hyperparameter_combinations(h_params_rf)
 classifier_param_dict['rf'] = h_params_combinations
-
-
+#2.4 Logistic regression
+h_params_lr = {}
+h_params_lr['solver'] = solver_list
+h_params_combinations       = get_hyperparameter_combinations(h_params_lr)
+classifier_param_dict['lr'] = h_params_combinations
 list_of_all_test_dev_combination_dictionaries = create_combinations_dict_from_lists(test_size_list, dev_size_list)
 
 results = []
@@ -132,7 +140,7 @@ for curr_run_i in range(num_runs):
         X_test  = preprocess_data(X_test)
         
 
-        for model_type in classifier_param_dict:
+        for model_type in model_types:
             #breakpoint()
             #4. Hyper paramter tuning
             #- take all combinations of gamma and C
@@ -169,19 +177,19 @@ print(best_model_path)
 std_test_acc    = results_df.groupby('model_type')['test_acc'].std()
 mean_test_acc   = results_df.groupby('model_type')['test_acc'].mean()
 
-best_model      = 'dtree'
-other_model     = 'svm'
-if mean_test_acc['svm'] >= mean_test_acc['dtree']:
-    best_model = 'svm'
-    other_model ='dtree'
+#best_model      = 'dtree'
+#other_model     = 'svm'
+#if mean_test_acc['svm'] >= mean_test_acc['dtree']:
+#    best_model = 'svm'
+#    other_model ='dtree'
 
-other_high  = mean_test_acc[other_model]    + std_test_acc[other_model]
-best_low    = mean_test_acc[best_model]     - std_test_acc[best_model]
+#other_high  = mean_test_acc[other_model]    + std_test_acc[other_model]
+#best_low    = mean_test_acc[best_model]     - std_test_acc[best_model]
 
-if (best_low > other_high):
-    print("high confidence that", best_model, "performing better ")
-else:
-    print("low confidence that", best_model, "performing better ")
+#if (best_low > other_high):
+#    print("high confidence that", best_model, "performing better ")
+#else:
+#    print("low confidence that", best_model, "performing better ")
 
 
 #breakpoint()

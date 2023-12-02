@@ -8,6 +8,7 @@ from joblib import dump, load
 import pdb
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 from sklearn.preprocessing import normalize
+from sklearn.linear_model import LogisticRegression
 
 def preprocess_data(data):
     n_samples = len(data)
@@ -29,6 +30,8 @@ def train_model(x,y, model_paramters, model_type="svm"):
         clf = tree.DecisionTreeClassifier
     elif model_type == "rf":
         clf = RandomForestClassifier
+    elif model_type == "lr":
+        clf = LogisticRegression
 
     model = clf(**model_paramters)
     # train the model
@@ -113,13 +116,17 @@ def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations, model_ty
     for h_params in h_params_combinations:
         cur_model = train_model(X_train, y_train, h_params, model_type = model_type)
         cur_accuracy, _,_ = predict_and_eval(cur_model, X_dev, y_dev)
+        
         if cur_accuracy > best_accuracy:
             #print("New best accuracy: ", cur_accuracy)
             best_accuracy = cur_accuracy
             best_model = cur_model
-            best_model_path = "./models/{}_".format(model_type) +"_".join(["{}:{}".format(k,v) for k,v in h_params.items()]) + ".joblib"
+            best_model_path = "./models/m22aie221_{}_".format(model_type) +"_".join(["{}:{}".format(k,v) for k,v in h_params.items()]) + ".joblib"
             best_hparams = h_params
-
+        cur_model_path =  "./models/m22aie221_{}_".format(model_type) +"_".join(["{}:{}".format(k,v) for k,v in h_params.items()]) + ".joblib"
+        dump(cur_model, cur_model_path)
+        print("{}".format(cur_accuracy))
+        print("Accuracy for {}: {:.2%}".format(cur_model_path, cur_accuracy))
     #print("Optimal paramters gamma: ", best_hparams[0], "C: ", best_hparams[1])
     # save the best model
     dump(best_model, best_model_path)

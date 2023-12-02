@@ -11,6 +11,7 @@ import pdb
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 import numpy as np
 
+
 app = Flask(__name__)
 
 @app.route("/hello/<val>")
@@ -36,6 +37,7 @@ def pred_image():
     best_model = load('./models/svm_gamma:0.001_C:1.joblib')
     image1_1d = np.array(image1).reshape(1, -1)
     predicted1 = best_model.predict(image1_1d)
+    print(predicted1)
     return str(predicted1)
 
 
@@ -50,3 +52,13 @@ def comp_image():
     predicted1 = best_model.predict(image1_1d)
     predicted2 = best_model.predict(image2_1d)
     return str(predicted1 == predicted2)
+
+
+@app.route("/")
+def hello_world1():
+    return "<p>Hello, World!</p>"
+
+@app.route("/", methods=["POST"])
+def hello_world_post():    
+    return {"op" : "Hello, World POST " + request.json["suffix"]}
+

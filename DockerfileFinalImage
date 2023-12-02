@@ -1,0 +1,3 @@
+FROM dependency-image:V1 AS ImageFin
+WORKDIR /digits
+CMD ["pytest"]

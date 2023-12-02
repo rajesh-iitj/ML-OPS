@@ -7,10 +7,12 @@ import os
 from joblib import dump, load
 import pdb
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
+from sklearn.preprocessing import normalize
 
 def preprocess_data(data):
     n_samples = len(data)
     data = data.reshape((n_samples, -1))
+    data = normalize(data, norm='l2')
     return data
 
 def split_data(x, y, test_size, random_state):

@@ -73,18 +73,40 @@ else:
         gamma_ranges        = svm_params['gamma']
         C_ranges            = svm_params['C']
 
+        # read the parameters for decission tree
+        dtree_params        = data['dtree']
+        max_depth_list      = dtree_params['max_depth']
+
+         # read the parameters for random tree
+        rf_params           = data['rf']
+        n_estimators_list   = rf_params['n_estimators']
+        criterion_list      = rf_params["criterion"]
+
 #1. Get the digits data set with images and targets
 X, y = read_digits();
 
 #2. Hyperparamter combinations
 classifier_param_dict = {}
 #2.1 SVM
-
 h_params_svm = {}
 h_params_svm['gamma'] = gamma_ranges
 h_params_svm['C'] = C_ranges
 h_params_combinations = get_hyperparameter_combinations(h_params_svm) 
 classifier_param_dict['svm'] = h_params_combinations
+
+#2.2 Decission trees
+
+h_params_tree = {}
+h_params_tree['max_depth'] = max_depth_list
+h_params_combinations = get_hyperparameter_combinations(h_params_tree) 
+classifier_param_dict['dtree'] = h_params_combinations
+
+#2.3 Ramdom forest
+h_params_rf = {}
+h_params_rf['n_estimators'] = n_estimators_list
+h_params_rf['criterion']    = criterion_list
+h_params_combinations       = get_hyperparameter_combinations(h_params_rf)
+classifier_param_dict['rf'] = h_params_combinations
 
 
 list_of_all_test_dev_combination_dictionaries = create_combinations_dict_from_lists(test_size_list, dev_size_list)
@@ -143,6 +165,24 @@ results_df = pd.DataFrame(results)
 print(best_model_path)
 
 #print(pd.DataFrame(results).groupby('model_type').describe().T)
+
+std_test_acc    = results_df.groupby('model_type')['test_acc'].std()
+mean_test_acc   = results_df.groupby('model_type')['test_acc'].mean()
+
+best_model      = 'dtree'
+other_model     = 'svm'
+if mean_test_acc['svm'] >= mean_test_acc['dtree']:
+    best_model = 'svm'
+    other_model ='dtree'
+
+other_high  = mean_test_acc[other_model]    + std_test_acc[other_model]
+best_low    = mean_test_acc[best_model]     - std_test_acc[best_model]
+
+if (best_low > other_high):
+    print("high confidence that", best_model, "performing better ")
+else:
+    print("low confidence that", best_model, "performing better ")
+
 
 #breakpoint()
 

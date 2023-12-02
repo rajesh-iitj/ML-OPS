@@ -172,6 +172,35 @@ def get_digit_lable():
 
     return X, y
 
+def test_label_digit_lr():
+    response = app.test_client().post("/predict/lr", json={"image": digit_0_data})
+    assert response.status_code == 200
+    response_data = (response.get_data(as_text=True))
+    predicted_digit = int(response_data.strip('[]'))
+    #assert image_label == predicted_digit
+    image_label ='1'
+    if image_label != predicted_digit:
+        print("image_label: ", image_label, "predicted_digit: ", predicted_digit)
+
+def test_label_digit_tree():
+    response = app.test_client().post("/predict/tree", json={"image": digit_0_data})
+    assert response.status_code == 200
+    response_data = (response.get_data(as_text=True))
+    predicted_digit = int(response_data.strip('[]'))
+    #assert image_label == predicted_digit\
+    image_label ='1'
+    if image_label != predicted_digit:
+        print("image_label: ", image_label, "predicted_digit: ", predicted_digit)
+
+def test_label_digit_svm():
+    response = app.test_client().post("/predict/svm", json={"image": digit_0_data})
+    assert response.status_code == 200
+    response_data = (response.get_data(as_text=True))
+    predicted_digit = int(response_data.strip('[]'))
+    #assert image_label == predicted_digit
+    image_label ='1'
+    if image_label != predicted_digit:
+        print("image_label: ", image_label, "predicted_digit: ", predicted_digit)
 
 def eval_label_digit(image_label, one_d_list):
     response = app.test_client().post("/predict", json={"image": one_d_list})

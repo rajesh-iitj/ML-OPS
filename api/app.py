@@ -62,3 +62,22 @@ def hello_world1():
 def hello_world_post():    
     return {"op" : "Hello, World POST " + request.json["suffix"]}
 
+
+def load_model(model_type):
+    if model_type == 'svm':
+        model = load('./models/m22aie221_svm_gamma_0.001C_1.joblib')
+    elif model_type == 'tree':
+        model = load('./models/m22aie221_dtree_max_depth_5.joblib')
+    elif model_type == 'lr':
+        model = load('./models/m22aie221_lr_solver_lbfgs.joblib')
+    return model
+
+@app.route("/predict/<model_type>", methods = ['POST'])
+def pred_image_model_type(model_type):
+    js = request.get_json( )
+    image1 = js['image']
+    model = load_model(model_type)
+    image1_1d = np.array(image1).reshape(1, -1)
+    predicted1 = model.predict(image1_1d)
+    print(predicted1)
+    return str(predicted1)

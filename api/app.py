@@ -34,7 +34,7 @@ def pred_model():
 def pred_image():
     js = request.get_json( )
     image1 = js['image']
-    best_model = load('./models/svm_gamma:0.001_C:1.joblib')
+    best_model = load('./models/m22aie221_svm_gamma_0.001C_1.joblib')
     image1_1d = np.array(image1).reshape(1, -1)
     predicted1 = best_model.predict(image1_1d)
     print(predicted1)
@@ -46,7 +46,7 @@ def comp_image():
     js = request.get_json( )
     image1 = js['image1']
     image2 = js['image2']
-    best_model = load('./models/svm_gamma:0.001_C:1.joblib')
+    best_model = load('./models/m22aie221_svm_gamma_0.001C_1.joblib')
     image1_1d = np.array(image1).reshape(1, -1)
     image2_1d = np.array(image2).reshape(1, -1)
     predicted1 = best_model.predict(image1_1d)

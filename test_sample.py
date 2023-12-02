@@ -7,6 +7,8 @@ import pdb
 import pytest
 import json
 from sklearn import datasets
+from joblib import load
+from sklearn.linear_model import LogisticRegression
 
 def inc(x):
     return x + 1
@@ -197,3 +199,26 @@ def test_post_predict():
         if (count == 10):
             break
         i = i + 1
+
+
+
+
+def test_lr_model_type():
+    model_path = "./models/m22aie221_lr_solver_lbfgs.joblib"
+
+
+    loaded_model = load(model_path)
+
+    assert isinstance(loaded_model, LogisticRegression)
+
+def test_solver_name():
+    model_path = "./models/m22aie221_lr_solver_lbfgs.joblib"
+
+    parts = model_path.split("_")
+    solver_name_from_filename = parts[-1].split(".")[0]
+
+    # Load the model from the file
+    loaded_model = load(model_path)
+    #breakpoint()
+    # Check that the solver name in the file name matches the solver used in the model
+    assert solver_name_from_filename == loaded_model.get_params(deep=True)['solver'], "Solver name in the file name does not match the solver used in the model."

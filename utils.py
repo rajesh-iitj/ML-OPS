@@ -121,9 +121,10 @@ def tune_hparams(X_train, y_train, X_dev, y_dev, h_params_combinations, model_ty
             #print("New best accuracy: ", cur_accuracy)
             best_accuracy = cur_accuracy
             best_model = cur_model
-            best_model_path = "./models/m22aie221_{}_".format(model_type) +"_".join(["{}:{}".format(k,v) for k,v in h_params.items()]) + ".joblib"
+            best_model_path = "./models/m22aie221_{}_".format(model_type) + "".join(["{}_{}".format(k, v) for k, v in h_params.items()]) + ".joblib"
             best_hparams = h_params
-        cur_model_path =  "./models/m22aie221_{}_".format(model_type) +"_".join(["{}:{}".format(k,v) for k,v in h_params.items()]) + ".joblib"
+        #cur_model_path =  "./models/m22aie221_{}_".format(model_type) +"_".join(["{}:{}".format(k,v) for k,v in h_params.items()]) + ".joblib"
+        cur_model_path = "./models/m22aie221_{}_".format(model_type) + "".join(["{}_{}".format(k, v) for k, v in h_params.items()]) + ".joblib"
         dump(cur_model, cur_model_path)
         print("{}".format(cur_accuracy))
         print("Accuracy for {}: {:.2%}".format(cur_model_path, cur_accuracy))
